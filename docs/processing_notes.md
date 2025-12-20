@@ -12,8 +12,8 @@ The datasets in this repository were created through a multi-step process:
 2. **Alignment** across administrative levels
 3. **Simplification** for performance
 4. **Attribute cleaning** (Arabic text, names)
-5. **Data enrichment** (population, disease rates)
-6. **Export** to multiple formats
+5. **Data enrichment** (population, Wikidata linkage)
+6. **Export** to GeoPackage format
 
 ---
 
@@ -175,8 +175,7 @@ OSM data extraction can produce HTML entities in Arabic text:
 **Columns cleaned**:
 - `name` (Arabic name)
 - `name_ar` (Arabic name, standardized)
-- `District Name in Arabic` (CSV files)
-- `Governorate Name in Arabic` (CSV files)
+- All Arabic name variants in attribute tables
 
 **Manual verification**:
 - Cross-checked 20% of names against official Jordan government websites
@@ -248,58 +247,11 @@ Pop_district_i = Pop_governorate × (WorldPop_district_i / Σ WorldPop_governora
 - Total Jordan population: 10.2 million (matches official 2024 estimate)
 
 **Column added**:
-- `Population 2024#number` (in GPKG)
-- `Population 2024` (in CSV)
+- `Population 2024#number` (in GeoPackage files)
 
 ---
 
-## Step 7: Disease Data Integration
-
-### Source
-
-**Jordan Ministry of Health Surveillance System**
-- Period: 2022-2023 (24 months aggregated)
-- Diseases: 7 notifiable infectious diseases
-- Resolution: District level (51 districts)
-
-### Diseases Included
-
-1. **Diarrheal Diseases** (all-cause)
-2. **Escherichia coli Infections**
-3. **Giardiasis**
-4. **Gonococcal Infections**
-5. **Salmonella Infections**
-6. **Scabies**
-7. **Typhoid and Paratyphoid Fevers**
-
-### Rate Calculation
-
-**Age-adjusted incidence per 100,000**:
-```
-Rate_district = (Cases_district / Population_district) × 100,000
-```
-
-**Age adjustment**:
-- Standardized to 2020 Jordan population structure
-- Ensures comparability across districts with different age distributions
-
-**Data quality**:
-- Missing values: 0 (all districts reported for all diseases)
-- Outliers: Checked against historical trends; all values plausible
-- Confidentiality: Aggregated to district level (no individual cases identifiable)
-
-**Columns added** (CSV files only):
-- `Diarrheal Diseases per 100K`
-- `Escherichia coli Infections per 100K`
-- `Giardiasis per 100K`
-- `Gonococcal Infections per 100K`
-- `Salmonella Infections per 100K`
-- `Scabies per 100K`
-- `Typhoid and Paratyphoid Fevers per 100K`
-
----
-
-## Step 8: Export to Multiple Formats
+## Step 7: Export to GeoPackage Format
 
 ### GeoPackage (GPKG)
 
@@ -315,19 +267,10 @@ Rate_district = (Cases_district / Population_district) × 100,000
 - Encoding: UTF-8
 - Geometry type: Polygon (2D)
 
-### CSV
-
-**Why CSV for attributes?**
-- Universal compatibility (Excel, R, Python, etc.)
-- Easier to version control with Git (text-based)
-- Enables non-GIS users to access tabular data
-- Lightweight for disease surveillance analysis
-
-**Export settings**:
-- Delimiter: Comma (`,`)
-- Encoding: UTF-8 with BOM (for Excel compatibility with Arabic)
-- Geometry: Exported as WKT text (for users who want geometries in CSV)
-- Line endings: Windows (CRLF) for broad compatibility
+**Output files**:
+- `gov_simpl_20m.gpkg` - 12 governorates
+- `dis_simpl_20m.gpkg` - 51 districts
+- `subdis_simpl_20m.gpkg` - 89 subdistricts
 
 ---
 
@@ -348,7 +291,6 @@ Rate_district = (Cases_district / Population_district) × 100,000
 - ✓ All features have names (English and Arabic)
 - ✓ Wikidata IDs are valid (checked against Wikidata API)
 - ✓ Population values are positive integers
-- ✓ Disease rates are non-negative floats
 - ✓ No missing values in required fields
 
 ### Cross-Level Consistency
@@ -373,10 +315,6 @@ Boundaries reflect 2023-2024 administrative structure. Historical changes (e.g.,
 ### 3. OSM Data Quality
 
 OSM boundaries are community-maintained and may not exactly match official government gazetteers. We verified major boundaries (governorates, large districts) against official sources, but some small subdistrict boundaries may have minor discrepancies (<100m).
-
-### 4. Disease Data Privacy
-
-Disease rates are aggregated to district level to protect patient privacy. Subdistrict-level data exist but cannot be publicly released due to small case counts in some areas.
 
 ---
 
@@ -411,8 +349,8 @@ Available in related repositories:
 
 - [ ] Lower administrative levels (neighborhoods, villages)
 - [ ] Historical boundaries (2015, 2020)
-- [ ] Monthly disease time series (currently annual)
 - [ ] Integration with census tracts
+- [ ] Additional demographic indicators
 
 ---
 
@@ -428,6 +366,5 @@ Questions about processing methods?
 
 Processing pipeline developed with support from:
 - OpenStreetMap Jordan community
-- Jordan Ministry of Health, Directorate of Communicable Diseases
 - WorldPop project (University of Southampton)
 - Wikidata contributors

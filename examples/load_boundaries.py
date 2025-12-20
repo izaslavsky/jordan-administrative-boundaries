@@ -16,7 +16,6 @@ from pathlib import Path
 # Set up paths (adjust to your local directory)
 DATA_DIR = Path("../data")
 GPKG_DIR = DATA_DIR / "gpkg"
-CSV_DIR = DATA_DIR / "csv"
 
 # ==============================================================================
 # Example 1: Load and display governorate boundaries
@@ -45,60 +44,41 @@ plt.savefig("governorates_map.png", dpi=150)
 print("\nSaved map to: governorates_map.png")
 
 # ==============================================================================
-# Example 2: Load and analyze districts with disease data
+# Example 2: Load and visualize districts
 # ==============================================================================
 
 print("\n" + "=" * 80)
-print("Example 2: District Disease Analysis")
+print("Example 2: District Visualization")
 print("=" * 80)
 
 # Load districts (spatial)
 districts = gpd.read_file(GPKG_DIR / "dis_simpl_20m.gpkg")
 print(f"\nLoaded {len(districts)} districts from GPKG")
+print(f"\nAvailable columns: {', '.join(districts.columns[:10])}...")
 
-# Load district attributes (CSV with disease data)
-districts_csv = pd.read_csv(CSV_DIR / "Districts.csv")
-print(f"Loaded {len(districts_csv)} districts from CSV")
-
-# Merge GPKG and CSV using wikidata as key
-# First, clean up the long column name in GPKG
-if 'districts_for_suave_with100K_2_no_wkt_wikidata#hiddenmore' in districts.columns:
-    districts['wikidata_join'] = districts['districts_for_suave_with100K_2_no_wkt_wikidata#hiddenmore']
-else:
-    districts['wikidata_join'] = districts['wikidata']
-
-# Merge on wikidata
-districts_merged = districts.merge(
-    districts_csv[['wikidata', 'Diarrheal Diseases per 100K']],
-    left_on='wikidata_join',
-    right_on='wikidata',
-    how='left'
-)
-
-# Plot diarrheal disease rates
+# Plot districts colored by governorate
 fig, ax = plt.subplots(figsize=(12, 10))
-districts_merged.plot(
-    column='Diarrheal Diseases per 100K',
+districts.plot(
+    column='name_en_2',  # Parent governorate name
     ax=ax,
     legend=True,
-    cmap='YlOrRd',
+    cmap='tab12',
     edgecolor='black',
     linewidth=0.5,
-    legend_kwds={'label': "Diarrheal Disease Incidence (per 100K)", 'shrink': 0.6}
+    legend_kwds={'title': "Governorate", 'bbox_to_anchor': (1.05, 1), 'loc': 'upper left'}
 )
-ax.set_title("Diarrheal Disease Incidence by District (per 100,000)",
+ax.set_title("Jordan Districts Colored by Governorate",
              fontsize=14, fontweight='bold')
 ax.axis('off')
 plt.tight_layout()
-plt.savefig("diarrheal_disease_map.png", dpi=150)
-print("\nSaved disease map to: diarrheal_disease_map.png")
+plt.savefig("districts_by_governorate.png", dpi=150, bbox_inches='tight')
+print("\nSaved district map to: districts_by_governorate.png")
 
-# Print summary statistics
-print(f"\nDiarrheal Disease Statistics:")
-print(f"  Mean: {districts_csv['Diarrheal Diseases per 100K'].mean():.1f} per 100K")
-print(f"  Median: {districts_csv['Diarrheal Diseases per 100K'].median():.1f} per 100K")
-print(f"  Min: {districts_csv['Diarrheal Diseases per 100K'].min():.1f} per 100K")
-print(f"  Max: {districts_csv['Diarrheal Diseases per 100K'].max():.1f} per 100K")
+# Print summary by governorate
+print(f"\nDistricts per Governorate:")
+districts_per_gov = districts.groupby('name_en_2').size().sort_values(ascending=False)
+for gov, count in districts_per_gov.items():
+    print(f"  {gov}: {count} districts")
 
 # ==============================================================================
 # Example 3: Spatial joins - Find which governorate each district belongs to
@@ -167,9 +147,10 @@ print("Exported governorates to: governorates.shp")
 districts.to_file("districts.geojson", driver="GeoJSON")
 print("Exported districts to: districts.geojson")
 
-# Export district attributes to Excel
-districts_csv.to_excel("districts_data.xlsx", index=False)
-print("Exported district data to: districts_data.xlsx")
+# Export district attributes to CSV (without geometry)
+districts_df = pd.DataFrame(districts.drop(columns='geometry'))
+districts_df.to_csv("districts_attributes.csv", index=False)
+print("Exported district attributes to: districts_attributes.csv")
 
 # ==============================================================================
 # Example 6: Filter and subset

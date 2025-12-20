@@ -67,40 +67,6 @@ Complete reference for all columns in the Jordan Administrative Boundaries datas
 
 ---
 
-## Districts CSV (`Districts.csv`)
-
-This is a cleaned, analysis-ready version of the district data with disease surveillance information.
-
-| Column Name | Data Type | Description | Example | Source |
-|-------------|-----------|-------------|---------|--------|
-| `geometry` | String | WKT polygon representation | `POLYGON((36.1...))` | OSM |
-| `District Name` | String | District name (English) | `Mahes and Fuhais District` | OSM |
-| `Governorate Name` | String | Parent governorate (English) | `Balqa` | OSM |
-| `District Name in Arabic` | String | District name (Arabic) | `لواء ماحص والفحيص` | OSM, cleaned |
-| `Governorate Name in Arabic` | String | Governorate name (Arabic) | `البلقاء` | OSM, cleaned |
-| `wikidata` | String | Wikidata entity ID | `Q27126262` | Wikidata |
-| `name` | String | District name (Arabic, original) | `لواء ماحص والفحيص` | OSM |
-| `href` | String | External reference URL (if any) | URL or NULL | External |
-| `Wikidata` | String | Wikidata URL | `https://www.wikidata.org/wiki/...` | Wikidata |
-| `Population 2024` | Integer | 2024 population estimate | `45020` | Census |
-| `img` | String | Image URL (if available) | URL or NULL | External |
-| `Diarrheal Diseases per 100K` | Float | Annual incidence per 100,000 | `127.5` | MoH surveillance |
-| `Escherichia coli Infections per 100K` | Float | Annual incidence per 100,000 | `15.3` | MoH surveillance |
-| `Giardiasis per 100K` | Float | Annual incidence per 100,000 | `8.7` | MoH surveillance |
-| `Gonococcal Infections per 100K` | Float | Annual incidence per 100,000 | `2.1` | MoH surveillance |
-| `Salmonella Infections per 100K` | Float | Annual incidence per 100,000 | `12.4` | MoH surveillance |
-| `Scabies per 100K` | Float | Annual incidence per 100,000 | `45.8` | MoH surveillance |
-| `Typhoid and Paratyphoid Fevers per 100K` | Float | Annual incidence per 100,000 | `3.2` | MoH surveillance |
-
-**Notes**:
-- Disease rates are **age-adjusted** annual incidence per 100,000 population
-- Disease data period: 2022-2023 (latest available)
-- Rates calculated from Jordan Ministry of Health surveillance system
-- Missing values (if any) indicate no cases reported or data unavailable
-- `geometry` column is WKT text, not binary geometry (use `gpd.GeoDataFrame.from_wkt()` to convert)
-
----
-
 ## Subdistricts GPKG (`subdis_simpl_20m.gpkg`)
 
 | Column Name | Data Type | Description | Example | Source |
@@ -112,19 +78,7 @@ This is a cleaned, analysis-ready version of the district data with disease surv
 | `wikidata` | String | Wikidata entity ID (where available) | `Q...` | Wikidata |
 | *(other columns)* | Various | Similar structure to districts | - | - |
 
-**Note**: Subdistrict GPKG follows same structure as districts GPKG
-
----
-
-## Subdistricts CSV (`subdistricts_geo20m_clean.csv`)
-
-| Column Name | Data Type | Description | Example | Source |
-|-------------|-----------|-------------|---------|--------|
-| `geometry` | String | WKT polygon representation | `POLYGON((36.1...))` | OSM |
-| *(names and IDs)* | Various | Similar to districts CSV | - | - |
-| *(disease rates)* | Float | Annual incidence per 100K (if available) | - | MoH |
-
-**Note**: Subdistrict CSV follows same structure as districts CSV, with 89 rows
+**Note**: Subdistrict GPKG follows same structure as districts GPKG. See district documentation above for column details.
 
 ---
 
@@ -160,7 +114,7 @@ This is a cleaned, analysis-ready version of the district data with disease surv
 
 - **Boundaries**: Updated as needed (administrative changes are infrequent in Jordan)
 - **Population**: Annually (based on census projections)
-- **Disease rates**: Annually (based on MoH surveillance data release schedule)
+- **Metadata**: Updated as corrections or improvements are identified
 
 ---
 

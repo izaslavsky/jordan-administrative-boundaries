@@ -20,8 +20,8 @@ This repository provides clean, spatially-aligned administrative boundary datase
 - ✅ Simplified to 20m tolerance for performance while maintaining accuracy
 - ✅ Bilingual names (Arabic and English)
 - ✅ Linked to Wikidata for integration with other datasets
-- ✅ Available in both GeoPackage (spatial) and CSV (tabular) formats
-- ✅ Includes population data and disease rates (districts and subdistricts)
+- ✅ GeoPackage format - compatible with QGIS, ArcGIS, R, Python, and other GIS software
+- ✅ Includes population estimates and demographic data
 
 ---
 
@@ -29,7 +29,12 @@ This repository provides clean, spatially-aligned administrative boundary datase
 
 **Problem**: Many publicly available administrative boundary datasets for Jordan have misaligned boundaries at different levels, creating gaps and overlaps that complicate spatial analysis.
 
-**Solution**: We extracted boundaries from OpenStreetMap and carefully aligned them across all three administrative levels, ensuring topological consistency. The 20m simplification reduces file sizes by ~85% while maintaining visual and analytical accuracy at national and regional scales.
+**Commonly used sources we evaluated**:
+- **HumData/GeoBoundaries** (https://data.humdata.org/dataset/geoboundaries-admin-boundaries-for-jordan): Inconsistent geometries between admin level 1 (governorates) and level 2 (districts)
+- **GADM** (https://gadm.org/download_country.html): Misalignment issues between administrative levels
+- **Stanford Earthworks** (https://earthworks.stanford.edu/): Too generalized for district-level analysis and inconsistent
+
+**Solution**: We extracted boundaries from OpenStreetMap and carefully aligned them across all three administrative levels, ensuring topological consistency. We verified boundaries against official Jordan government statistical data on population and place names. The 20m simplification reduces file sizes by ~85% while maintaining visual and analytical accuracy at national and regional scales.
 
 ---
 
@@ -49,16 +54,7 @@ Located in `data/gpkg/`:
 
 **Coordinate Reference System**: WGS84 (EPSG:4326)
 
-### CSV Files (Attribute Tables)
-
-Located in `data/csv/`:
-
-| File | Rows | Description | Size |
-|------|------|-------------|------|
-| `Districts.csv` | 51 | District attributes + disease rates | 138 KB |
-| `subdistricts_geo20m_clean.csv` | 89 | Subdistrict attributes + disease rates | 146 KB |
-
-**Note**: CSV files contain a `geometry` column with WKT (Well-Known Text) representations of boundaries, plus additional analytical columns (population, disease rates per 100K) not present in the GPKG files.
+**Attributes**: All GeoPackage files include bilingual names (Arabic/English), Wikidata IDs, and population estimates stored directly in the spatial layer.
 
 ---
 
@@ -134,28 +130,9 @@ plot(st_geometry(districts), main="Jordan Districts")
 | `Population 2024#number` | Integer | 2024 population estimate |
 | *Other columns* | Various | Processing metadata (see data dictionary) |
 
-### Districts CSV (`Districts.csv`)
+### Subdistricts (`subdis_simpl_20m.gpkg`)
 
-Additional columns beyond GPKG:
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `geometry` | String | WKT polygon representation |
-| `District Name` | String | District name (English) |
-| `Governorate Name` | String | Parent governorate name (English) |
-| `District Name in Arabic` | String | District name (Arabic) |
-| `Governorate Name in Arabic` | String | Governorate name (Arabic) |
-| `Population 2024` | Integer | 2024 population estimate |
-| `Wikidata` | String | Wikidata URL |
-| `Diarrheal Diseases per 100K` | Float | Annual incidence rate |
-| `Escherichia coli Infections per 100K` | Float | Annual incidence rate |
-| `Giardiasis per 100K` | Float | Annual incidence rate |
-| `Gonococcal Infections per 100K` | Float | Annual incidence rate |
-| `Salmonella Infections per 100K` | Float | Annual incidence rate |
-| `Scabies per 100K` | Float | Annual incidence rate |
-| `Typhoid and Paratyphoid Fevers per 100K` | Float | Annual incidence rate |
-
-**Note**: Disease rates are age-adjusted annual incidence per 100,000 population.
+Similar structure to districts, with 89 third-level administrative units. See data dictionary for complete column reference.
 
 ---
 
@@ -168,8 +145,8 @@ Additional columns beyond GPKG:
    - Arabic text cleaned using [HTML Entity Decoder](https://github.com/Aro1810/html-entity-decoder-csv)
    - Wikidata IDs added for linkage to external datasets
    - Population estimates added from official sources
-5. **Disease Data Integration**: District-level disease surveillance data joined to boundaries
-6. **Export**: Final datasets exported to GeoPackage (spatial) and CSV (tabular) formats
+5. **Attribute Integration**: Population estimates and administrative metadata added from official sources
+6. **Export**: Final datasets exported to GeoPackage format
 
 ---
 
@@ -198,7 +175,7 @@ Additional columns beyond GPKG:
 
 ### GitHub Repositories
 
-- **HTML Entity Decoder**: Python script for cleaning Arabic text in CSV files
+- **HTML Entity Decoder**: Python script for cleaning Arabic text in data files
   https://github.com/Aro1810/html-entity-decoder-csv
 
 - **Jordan Disease Map**: Interactive Streamlit visualization of disease data by district
@@ -227,7 +204,7 @@ Additional columns beyond GPKG:
 ### Attribute Accuracy
 - **Names**: Cross-checked against Wikidata and official sources
 - **Population**: 2024 estimates based on latest available census/projection data
-- **Disease rates**: Calculated from Jordan Ministry of Health surveillance data (2022-2023)
+- **Wikidata IDs**: Validated against official Wikidata entries for each administrative unit
 
 ### Known Limitations
 - **Temporal currency**: Boundaries reflect 2023-2024 administrative structure; historical changes not tracked
@@ -268,7 +245,7 @@ Found an error or have an improvement? Contributions are welcome!
 - Initial release
 - 12 governorates, 51 districts, 89 subdistricts
 - Simplified to 20m tolerance
-- Disease rate data included in CSV files
+- GeoPackage format with all attributes
 - Bilingual names (Arabic/English)
 - Wikidata linkages added
 
@@ -285,9 +262,8 @@ For questions about data processing or usage:
 ## Acknowledgments
 
 - **OpenStreetMap contributors** for creating and maintaining administrative boundary data
-- **Jordan Ministry of Health** for disease surveillance data
 - **Wikidata community** for structured data on Jordanian administrative divisions
-- **HTML Entity Decoder** and **Jordan Disease Map** projects for data cleaning and visualization tools
+- **HTML Entity Decoder** project for data cleaning tools
 
 ---
 

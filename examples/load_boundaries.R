@@ -14,7 +14,6 @@ library(readr)
 # Set up paths (adjust to your local directory)
 DATA_DIR <- "../data"
 GPKG_DIR <- file.path(DATA_DIR, "gpkg")
-CSV_DIR <- file.path(DATA_DIR, "csv")
 
 # ==============================================================================
 # Example 1: Load and display governorate boundaries
@@ -68,61 +67,35 @@ ggsave("districts_by_governorate.png", p, width = 10, height = 12, dpi = 150)
 cat("Saved map to: districts_by_governorate.png\n")
 
 # ==============================================================================
-# Example 3: Load CSV data and merge with spatial boundaries
+# Example 3: Analyze district attributes
 # ==============================================================================
 
 cat("\n================================================================================\n")
-cat("Example 3: Merge Disease Data with Boundaries\n")
+cat("Example 3: Analyze District Attributes\n")
 cat("================================================================================\n\n")
 
-# Load district CSV with disease data
-districts_csv <- read_csv(file.path(CSV_DIR, "Districts.csv"),
-                          show_col_types = FALSE)
-cat(sprintf("Loaded CSV with %d rows\n", nrow(districts_csv)))
+# Count districts per governorate
+districts_summary <- districts %>%
+  st_drop_geometry() %>%
+  group_by(name_en_2) %>%
+  summarise(n_districts = n()) %>%
+  arrange(desc(n_districts))
 
-# Merge spatial data with CSV data using wikidata as key
-# First prepare the join key from districts
-districts <- districts %>%
-  mutate(wikidata_join = ifelse(
-    "districts_for_suave_with100K_2_no_wkt_wikidata#hiddenmore" %in% names(.),
-    .data[[`districts_for_suave_with100K_2_no_wkt_wikidata#hiddenmore`]],
-    wikidata
-  ))
+cat("Number of districts per governorate:\n")
+print(districts_summary)
 
-# Join
-districts_merged <- districts %>%
-  left_join(
-    districts_csv %>% select(wikidata, `Diarrheal Diseases per 100K`),
-    by = c("wikidata_join" = "wikidata")
-  )
-
-# Plot disease rates
-p_disease <- ggplot(districts_merged) +
-  geom_sf(aes(fill = `Diarrheal Diseases per 100K`),
-          color = "black", size = 0.3) +
-  scale_fill_gradient(low = "yellow", high = "red",
-                      name = "Incidence\nper 100K",
-                      na.value = "grey80") +
-  labs(title = "Diarrheal Disease Incidence by District",
-       subtitle = "Age-adjusted annual incidence per 100,000 population") +
+# Create a bar plot
+p_bar <- ggplot(districts_summary, aes(x = reorder(name_en_2, n_districts), y = n_districts)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Number of Districts per Governorate",
+       x = "Governorate",
+       y = "Number of Districts") +
   theme_minimal() +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid = element_blank())
+  theme(axis.text.y = element_text(size = 10))
 
-ggsave("diarrheal_disease_map_R.png", p_disease, width = 10, height = 12, dpi = 150)
-cat("Saved disease map to: diarrheal_disease_map_R.png\n")
-
-# Print summary statistics
-cat("\nDiarrheal Disease Statistics:\n")
-cat(sprintf("  Mean: %.1f per 100K\n",
-            mean(districts_csv$`Diarrheal Diseases per 100K`, na.rm = TRUE)))
-cat(sprintf("  Median: %.1f per 100K\n",
-            median(districts_csv$`Diarrheal Diseases per 100K`, na.rm = TRUE)))
-cat(sprintf("  Min: %.1f per 100K\n",
-            min(districts_csv$`Diarrheal Diseases per 100K`, na.rm = TRUE)))
-cat(sprintf("  Max: %.1f per 100K\n",
-            max(districts_csv$`Diarrheal Diseases per 100K`, na.rm = TRUE)))
+ggsave("districts_per_governorate_bar.png", p_bar, width = 8, height = 6, dpi = 150)
+cat("\nSaved bar chart to: districts_per_governorate_bar.png\n")
 
 # ==============================================================================
 # Example 4: Spatial operations - Calculate area and buffer
