@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Output files from examples (users will generate these)
+examples/*.png
+examples/*.shp
+examples/*.shx
+examples/*.dbf
+examples/*.prj
+examples/*.cpg
+examples/*.geojson
+examples/*.xlsx
+examples/*.csv
+
+# QGIS temporary files
+*.qgz~
+*.qgs~
+
+# Large data files (if users add uncompressed versions)
+*.zip
+*.tar.gz
+*.7z
+
+# Exclude very large unsimplified boundaries if added later
+data/gpkg/*_original.gpkg
+data/gpkg/*_unsimplified.gpkg
