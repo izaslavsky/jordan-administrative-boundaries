@@ -218,9 +218,9 @@ Similar structure to districts, with 89 third-level administrative units. See da
 If you use these datasets, please cite as:
 
 ```
-Jordan Administrative Boundaries (2024). Aligned governorate, district, and subdistrict
-boundaries derived from OpenStreetMap.
-https://github.com/[username]/jordan-administrative-boundaries
+Jordan Administrative Boundaries (2025). Aligned governorate, district, and subdistrict
+boundaries derived from OpenStreetMap. Compiled by Ilya Zaslavsky, UCSD.
+https://github.com/izaslavsky/jordan-administrative-boundaries
 ```
 
 **Data License**: Open Database License (ODbL) - https://opendatacommons.org/licenses/odbl/
